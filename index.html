@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clima con WeatherAPI</title>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+</head>
+<body>
+    <div class="target-clima">
+    <h1 data-aos="zoom-in" data-aos-delay="500" data-aos-duration="1500">Consulta del Clima</h1>
+    <h5 data-aos="fade-left"
+    data-aos-anchor="#example-anchor"
+    data-aos-offset="400"
+    data-aos-duration="2200"
+    data-aos-delay="1000">Por Santy.dev</h5>
+    <div class="contents">
+    <input type="text" id="city" placeholder="Escribe el nombre de la ciudad">
+    <button onclick="getWeather()" class="btn7" >Obtener clima</button >
+</div>
+    <div id="weather-info"></div>
+</div>
+
+    <script>
+        function getWeather() {
+            const city = document.getElementById('city').value.trim(); // Ciudad ingresada
+            const apiKey = '30a356c09b9a46b3b5f190531240212'; // Tu clave API
+            const url = `https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${encodeURIComponent(city)}&lang=es`;
+
+            if (!city) {
+                document.getElementById('weather-info').innerHTML = `<p data-aos="zoom-in">¡ Ehhh Ingresa la ciudad !</p>`;
+                return;
+            }
+
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Error al obtener los datos. Verifica la ciudad ingresada.');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.location) {
+                        // Datos exitosos
+                        const temp = data.current.temp_c;
+                        const description = data.current.condition.text;
+                        const cityName = data.location.name;
+                        const country = data.location.country;
+
+                        document.getElementById('weather-info').innerHTML = `
+                            <h3>El clima en ${cityName}, ${country}:</h3>
+                            <p>Temperatura: ${temp} °C</p>
+                            <p>Descripción: ${description}</p>
+                            <img src="${data.current.condition.icon}" alt="${description}">
+                        `;
+                    } else {
+                        document.getElementById('weather-info').innerHTML = `<p>No se encontró información para la ciudad ingresada.</p>`;
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('weather-info').innerHTML = `<p>${error.message}</p>`;
+                    console.error(error);
+                });
+        }
+    </script>
+</body>
+<script>
+    AOS.init();
+  </script>
+</html>
